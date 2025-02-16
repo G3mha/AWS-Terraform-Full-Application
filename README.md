@@ -1,29 +1,31 @@
-# Documentação Técnica do projeto `SimplePythonCRUD`
+# AWS Infrastructure using Terraform for a FastAPI CRUD Application
 
-## Introdução
+🇧🇷 Version in Portuguese: [click here](./README-pt_BR.md)
 
-Projeto desenvolvido por **Enricco Gemha** para a disciplina de **Computação em Nuvem** do curso de **Engenharia de Computação** do **Insper Instituto de Ensino e Pesquisa**.
+## Introduction
 
-Dado a especificação do projeto, foi desenvolvido um CRUD simples em Python utilizando os frameworks FastAPI e SQLAlchemy, e o banco de dados MySQL.
+Project developed by **Enricco Gemha** for the **Cloud Computing** course in the **Computer Engineering** program at **Insper Institute of Teaching and Research**.
 
-A aplicação foi hospedada na Amazon Web Services (AWS), sendo possível criar toda a infraestrutura necessária para a aplicação utilizando somente o script Terraform disponível neste repositório, bem como destruí-la completamente.
+Following the project specifications, a simple CRUD was developed in Python using FastAPI and SQLAlchemy frameworks, along with a MySQL database, available at [Python-FastAPI-CRUD](https://github.com/G3mha/Python-FastAPI-CRUD).
 
-## Subindo a infraestrutura com Terraform
+The application was hosted on Amazon Web Services (AWS), with all necessary infrastructure being created using only the Terraform script available in this repository, which can also be used to completely destroy it.
 
-Para começar, é necessário ter uma conta na AWS e obter seu `access_key_id` e `secret_access_key`.
+## Setting up infrastructure with Terraform
 
-O próximo passo é instalar o AWS CLI, e configurar as credenciais de acesso no seu computador, para isso siga as instruções disponíveis [aqui](https://docs.aws.amazon.com/pt_br/rekognition/latest/dg/setup-awscli-sdk.html).
+To begin, you need an AWS account and obtain your `access_key_id` and `secret_access_key`.
 
-Em seguida, é necessário instalar o Terraform, para isso siga as instruções disponíveis [aqui](https://developer.hashicorp.com/terraform/install).
+The next step is to install AWS CLI and configure your access credentials on your computer. Follow the instructions available [here](https://docs.aws.amazon.com/pt_br/rekognition/latest/dg/setup-awscli-sdk.html).
 
-E configure o arquivo `terraform.tfvars` no `<path_to_this_project>/terraform` com as informações necessárias para a criação da infraestrutura. O arquivo deve ter o seguinte formato:
+Then, you need to install Terraform. Follow the instructions available [here](https://developer.hashicorp.com/terraform/install).
+
+Configure the `terraform.tfvars` file in `<path_to_this_project>/terraform` with the necessary information for creating the infrastructure. The file should have the following format:
 
 ```terraform
-db_username = "<usuário>"
-db_password = "<senha>"
+db_username = "<username>"
+db_password = "<password>"
 ```
 
-**Assumindo que você esteja na raíz do repositório**, execute os seguintes comandos:
+**Assuming you are in the repository root**, execute the following commands:
 
 ```bash
 cd terraform/bucket
@@ -41,15 +43,15 @@ terraform plan -out="tfplan"
 terraform apply "tfplan"
 ```
 
-## Testando a aplicação
+## Testing the application
 
-Ao final da execução do Terraform, serão exibidos no terminal, respectivamente, o ALB DNS name e o Locust Public IPv4 DNS.
+After Terraform execution completes, the ALB DNS name and Locust Public IPv4 DNS will be displayed in the terminal.
 
-Para testar a aplicação FastAPI, é necessário acessar o endereço da ALB no navegador. Para testar a aplicação Locust, é necessário acessar o endereço do Locust no navegador.
+To test the FastAPI application, access the ALB address in your browser. To test the Locust application, access the Locust address in your browser.
 
-## Destruindo a infraestrutura com Terraform
+## Destroying infrastructure with Terraform
 
-Para destruir a infraestrutura, execute os seguintes comandos:
+To destroy the infrastructure, execute the following commands:
 
 ```bash
 cd terraform/bucket
@@ -62,256 +64,234 @@ cd ..
 terraform destroy
 ```
 
-## Diagrama de infraestrutura
+## Infrastructure Diagram
 
-![Diagrama de infraestrutura](./docs/diagram.png)
+![Infrastructure Diagram](./docs/diagram.png)
 
-Neste diagrama, cada cor representa uma camada de abstração da infraestrutura, sendo `preto` a cor referente a camada de serviços AWS, ou seja, a camada de "cloud", em `roxo` a camada de rede, como o IPRouter e a VPC, em `vermelho` as camadas de segurança, representadas pelos Security Groups, em `verde` as camadas de subnets, pública e privada, em `azul` a camada de monitoramento, representada pelo CloudWatch, e em `laranja` a camada de aplicação, representada pelas instâncias EC2, o ALB e o banco de dados RDS, bem como a própria aplicação CRUD que é visível ao usuário. A World Wide Web é representada por um círculo em `azul`. As setas representam a comunicação entre os serviços.
+In this diagram, each color represents an infrastructure abstraction layer: `black` refers to AWS services layer (cloud layer), `purple` represents the network layer, such as IPRouter and VPC, `red` represents security layers shown by Security Groups, `green` represents public and private subnet layers, `blue` represents the monitoring layer shown by CloudWatch, and `orange` represents the application layer, shown by EC2 instances, ALB, and RDS database, as well as the CRUD application visible to users. The World Wide Web is represented by a `blue` circle. Arrows represent communication between services.
 
-## Documentação da aplicação
+## Application Documentation
 
-Serviços utilizados:
+Services used:
 
 ### VPC (Virtual Private Cloud)
 
-A Virtual Private Cloud (VPC) foi criada para isolar a infraestrutura. A VPC possui CIDR 172.31.0.0/16. Assim, geramos 2 subnets privadas e 2 subnets públicas, sendo:
+The Virtual Private Cloud (VPC) was created to isolate the infrastructure. The VPC has CIDR 172.31.0.0/16. We created 2 private subnets and 2 public subnets:
 
-- Subnet privada 1:
+- Private subnet 1:
   - CIDR: 172.31.0.0/26
-  - Availability Zone: `eu-west-1a`;
+  - Availability Zone: `eu-west-1a`
 
-- Subnet privada 2:
+- Private subnet 2:
   - CIDR: 172.31.0.64/26
-  - Availability Zone: `eu-west-1b`;
+  - Availability Zone: `eu-west-1b`
 
-- Subnet pública 1:
+- Public subnet 1:
   - CIDR: 172.31.0.128/26
-  - Availability Zone: `eu-west-1a`;
+  - Availability Zone: `eu-west-1a`
 
-- Subnet pública 2:
+- Public subnet 2:
   - CIDR: 172.31.0.192/26
-  - Availability Zone: `eu-west-1b`;
+  - Availability Zone: `eu-west-1b`
 
 ### Security Groups
 
-Para garantir a segurança da aplicação, foram criados quatro Security Groups, permitindo somente os serviços necessários para o funcionamento da aplicação. São eles:
+To ensure application security, four Security Groups were created, allowing only necessary services for application operation:
 
 - ALB Security Group:
-  - Entrada: permite tráfego HTTP (80) e SSH (22) de qualquer origem;
-  - Saída: permite tráfego de qualquer protocolo para qualquer destino;
+  - Inbound: allows HTTP (80) and SSH (22) traffic from any source
+  - Outbound: allows traffic of any protocol to any destination
 
 - EC2 Security Group:
-  - Entrada: permite tráfego HTTP (80) proveniente do ALB Security Group e SSH (22) de qualquer origem;
-  - Saída: permite tráfego de qualquer protocolo para qualquer destino;
+  - Inbound: allows HTTP (80) traffic from ALB Security Group and SSH (22) from any source
+  - Outbound: allows traffic of any protocol to any destination
 
 - RDS Security Group:
-  - Entrada: permite tráfego MySQL (3306) proveniente do EC2 Security Group;
-  - Saída: permite tráfego de qualquer protocolo para qualquer destino;
+  - Inbound: allows MySQL (3306) traffic from EC2 Security Group
+  - Outbound: allows traffic of any protocol to any destination
 
 - Locust Security Group:
-  - Entrada: permite tráfego de qualquer protocolo para qualquer origem;
-  - Saída: permite tráfego de qualquer protocolo para qualquer destino;
+  - Inbound: allows traffic of any protocol from any source
+  - Outbound: allows traffic of any protocol to any destination
 
 ### IAM
 
-Para garantir que as permissões adequadas fossem assinaladas para as instâncias EC2, foi criado um IAM Role, com permissões de escrita de logs, principalmente.
+To ensure appropriate permissions for EC2 instances, an IAM Role was created with permissions primarily for log writing.
 
 ### RDS (Relational Database Service)
 
-O RDS foi criado para hospedar o banco de dados MySQL. Portanto, sua engine é `mysql` na versão `8.0.33`, com `Multi-AZ` habilitado. Os backups são retidos por 7 dias, e com uma janela de manutenção semanal, às segundas-feiras, das 03:00 às 04:00, e de backup diário, das 04:00 às 05:00. O RDS possui uma instância `db.t2.micro` com 20GB de armazenamento `gp2`. Para garantir a segurança do acesso ao banco de dados, os dados de usuário e senha são configurados em um arquivo `terraform.tfvars` e estão disponíveis somente neles.
+RDS was created to host the MySQL database. It uses `mysql` engine version `8.0.33` with `Multi-AZ` enabled. Backups are retained for 7 days, with a weekly maintenance window on Mondays from 03:00 to 04:00, and daily backup window from 04:00 to 05:00. RDS uses a `db.t2.micro` instance with 20GB of `gp2` storage. To ensure database access security, user and password data are configured in a `terraform.tfvars` file and are only available there.
 
 ### ALB (Application Load Balancer)
 
-O ALB foi criado para balancear a carga entre as instâncias EC2. Ele está disponível publicamente na Internet. Ele tem um listener na porta 80 que encaminha o tráfego para o Target Group configurado (Instâncias EC2).
+The ALB was created to balance load between EC2 instances. It is publicly available on the Internet. It has a listener on port 80 that forwards traffic to the configured Target Group (EC2 Instances).
 
 ### ASG (Auto Scaling Group)
 
-Mantém a quantidade de instâncias EC2 em 2, com um mínimo de 2 e um máximo de 6. A política de escalonamento é configurada para expandir a quantidade de instâncias quando a utilização de CPU atingir 70%, e reduzir a quantidade de instâncias quando a utilização de CPU atingir 20%. A política de Health Check é configurada para verificar a saúde das instâncias a cada 5 minutos, com um tempo de espera de 1 minuto, e um limite de 1 falha consecutiva.
+Maintains EC2 instance count at 2, with a minimum of 2 and maximum of 6. The scaling policy is configured to expand instance count when CPU utilization reaches 70%, and reduce when it reaches 20%. Health Check policy is configured to check instance health every 5 minutes, with a 1-minute wait time and a limit of 1 consecutive failure.
 
-## Decisões técnicas
+## Technical Decisions
 
-- Para a aplicação, configurada em Ubuntu, foi utilizado Elastic Compute Cloud (EC2);
-- Para banco de dados, foi hospedado no Relational Database Service (RDS);
-- Para a comunicação entre os serviços, foi utilizado o serviço de Virtual Private Cloud (VPC);
-- Para monitoramento de utilização, foram implementadas métricas e políticas utilizando o serviço de CloudWatch;
-- Para balanceamento de carga, foi utilizado o serviço de Application Load Balancer (ALB);
-- Para garantir a proteção da comunicação entre os serviços, foram criados _firewalls_, utilizando o serviço de Security Groups;
-- Para garantir o redirecionamento para somente instância saudáveis, foram implementados Health Checks para o ALB;
-- Para garantir a alta disponibilidade, foram criadas duas instâncias EC2 padrão, escaláveis até seis, através de uma Auto Scaling Group (ASG);
-- Para garantir que não haja concorrência nas operações do Terraform, foi utilizado o serviço de Locking do DynamoDB, com armazenamento de estado no S3, garantindo o versionamento do código;
-- Para garantir a segurança das instâncias, foi criado um IAM Role, com somente as permissões necessárias para a execução do script de instalação e configuração da aplicação.
+- For the application, configured on Ubuntu, Elastic Compute Cloud (EC2) was used
+- For database, it was hosted on Relational Database Service (RDS)
+- For service communication, Virtual Private Cloud (VPC) service was used
+- For usage monitoring, metrics and policies were implemented using CloudWatch service
+- For load balancing, Application Load Balancer (ALB) service was used
+- To ensure service communication protection, firewalls were created using Security Groups service
+- To ensure redirection to only healthy instances, Health Checks were implemented for ALB
+- To ensure high availability, two standard EC2 instances were created, scalable up to six, through an Auto Scaling Group (ASG)
+- To ensure no concurrency in Terraform operations, DynamoDB Locking service was used, with state storage in S3, ensuring code versioning
+- To ensure instance security, an IAM Role was created with only necessary permissions for application installation and configuration script execution
 
-### A escolha de região
+### Region Selection
 
-Com regiões de disponilibidade em todo o mundo, vem também a necessidade de escolher uma região com requisitos que favoreça o desempenho e custo da aplicação. Esses benefícios são obtidos através de requisitos de:
+With availability regions worldwide, there's a need to choose a region with requirements that favor application performance and cost. These benefits are obtained through requirements of:
 
-- **Velocidade de Conexão** (Latência):
-  - Por ser uma aplicação web que não será consumida como produto final, a latência é um fator opcional, pois não é um fator que influencia diretamente na experiência do usuário. Por isso **não foi um fator decisivo na escolha** da região;
+- **Connection Speed** (Latency):
+  - As a web application that won't be consumed as a final product, latency is an optional factor as it doesn't directly influence user experience. Therefore, it **was not a decisive factor** in region selection
 
-- **Velocidade de Processamento**:
-  - Devido aos dados a serem processados serem pequenos e simples, a velocidade de processamento não impacta de forma relevante na aplicação, portanto **não foi um fator decisivo na escolha** da região;
+- **Processing Speed**:
+  - Due to small and simple data processing, processing speed doesn't significantly impact the application, therefore it **was not a decisive factor** in region selection
 
-- Disponibilidade de Serviços:
-  - A AWS possui uma grande variedade de serviços, e a maioria deles está disponível em todas as regiões, contudo existem restrições. Por exemplo, o `t2.micro`, escolhida por ser a opção _low-cost_ e _general purpose_ da AWS, está [disponível somente em](https://aws.amazon.com/pt/about-aws/whats-new/2014/07/01/introducing-t2-the-new-low-cost-general-purpose-instance-type-for-amazon-ec2/):
-    - `us-east-1` (N. Virginia);
-    - `us-west-2` (Oregon);
-    - `eu-west-1` (Ireland);
-    - `ap-northeast-1` (Tokyo);
-    - `ap-southeast-1` (Singapore);
-    - `ap-southeast-2` (Sydney);
-    - `sa-east-1` (São Paulo);
-  - Há também a necessidade de se descartar as regiões com outages mais frequentes, e como podemos ver nesta [_thread_ da YCombinator](https://news.ycombinator.com/item?id=13756082) (Aceleradora de Startups de Silicon Valley), a região `us-east-1` (N. Virginia) é explicitamente não recomendada, pois possui um histórico de outages mais frequentes, bem como equipamento ultrapassado. Ainda no mesmo tópico, o site [AWSManiac](https://awsmaniac.com/aws-outages/) menciona as seguintes regiões como as de maior quantidade de outages da história da AWS, nesta ordem:
-    - `us-east-1` (N. Virginia);
-    - `ap-southeast-2` (Sydney);
-    - `ap-northest-1` (Tokyo);
-  - O site [StatusGator](https://statusgator.com/blog/is-north-virginia-aws-region-the-least-reliable-and-why/) oferece uma lista com as regiões com maior tempo de downtimes parcias em 2022, sendo, nesta ordem, as três piores:
-    - `us-east-1` (N. Virginia);
-    - `us-west-2` (Oregon);
-    - `us-east-2` (Ohio);
+- Service Availability:
+  - AWS has a wide variety of services, and most are available in all regions, but there are restrictions. For example, `t2.micro`, chosen for being AWS's low-cost and general purpose option, is [only available in](https://aws.amazon.com/pt/about-aws/whats-new/2014/07/01/introducing-t2-the-new-low-cost-general-purpose-instance-type-for-amazon-ec2/):
+    - `us-east-1` (N. Virginia)
+    - `us-west-2` (Oregon)
+    - `eu-west-1` (Ireland)
+    - `ap-northeast-1` (Tokyo)
+    - `ap-southeast-1` (Singapore)
+    - `ap-southeast-2` (Sydney)
+    - `sa-east-1` (São Paulo)
+  - There's also a need to discard regions with more frequent outages, and as we can see in this [YCombinator thread](https://news.ycombinator.com/item?id=13756082) (Silicon Valley Startup Accelerator), the `us-east-1` (N. Virginia) region is explicitly not recommended due to more frequent outages and outdated equipment. In the same topic, the [AWSManiac](https://awsmaniac.com/aws-outages/) site mentions the following regions as having the highest number of outages in AWS history, in this order:
+    - `us-east-1` (N. Virginia)
+    - `ap-southeast-2` (Sydney)
+    - `ap-northest-1` (Tokyo)
+  - The [StatusGator](https://statusgator.com/blog/is-north-virginia-aws-region-the-least-reliable-and-why/) site offers a list of regions with the longest partial downtimes in 2022, with the three worst being, in order:
+    - `us-east-1` (N. Virginia)
+    - `us-west-2` (Oregon)
+    - `us-east-2` (Ohio)
 
-- Custo de Serviços:
-  - O custo de serviços é um fator importante em qualquer aplicação, e como o objetivo deste projeto é criar uma aplicação de baixo custo, é necessário escolher uma região que ofereça os serviços necessários com o menor custo possível. Os dados são o site [ConcurrencyLabs](https://www.concurrencylabs.com/blog/choose-your-aws-region-wisely/), com dados extraídos da AWS PriceList API. Portanto, da lista da `t2.micro` acima, podemos observar os seguintes preços (porcentagem de diferença em relação a `us-east-1`, a mais barata):
-    - [0%] `us-east-1` (N. Virginia);
-    - [0%] `us-west-2` (Oregon);
-    - [11%] `eu-west-1` (Ireland);
-    - [22%] `ap-northeast-1` (Tokyo);
-    - [14%] `ap-southeast-1` (Singapore);
-    - [26%] `ap-southeast-2` (Sydney);
-    - [52%] `sa-east-1` (São Paulo);
+- Service Cost:
+  - Service cost is an important factor in any application, and as this project's goal is to create a low-cost application, it's necessary to choose a region that offers needed services at the lowest possible cost. Data from [ConcurrencyLabs](https://www.concurrencylabs.com/blog/choose-your-aws-region-wisely/) site, with data extracted from AWS PriceList API. Therefore, from the `t2.micro` list above, we can observe the following prices (percentage difference relative to `us-east-1`, the cheapest):
+    - [0%] `us-east-1` (N. Virginia)
+    - [0%] `us-west-2` (Oregon)
+    - [11%] `eu-west-1` (Ireland)
+    - [22%] `ap-northeast-1` (Tokyo)
+    - [14%] `ap-southeast-1` (Singapore)
+    - [26%] `ap-southeast-2` (Sydney)
+    - [52%] `sa-east-1` (São Paulo)
 
-Baseado nesses requisitos, excluímos todas as regiões que não possuem `t2.micro`. Em seguida, excluímos a região `us-east-1` (N. Virginia) pela imensa quantidade de outages. Excluímos `ap-southeast-2` (Sydney), `ap-northeast-1` (Tokyo) e `sa-east-1` (São Paulo) por possuírem uma grande diferença de custo em relação a `us-east-1` (N. Virginia). E por fim, excluímos `us-west-2` (Oregon) por possuir um histórico de outages, apesar de ser a segunda região mais barata. Com isso, ficamos em um empate entre `eu-west-1` (Ireland) e `ap-southeast-1` (Singapore), e como a região `eu-west-1` (Ireland) possui um custo 11% menor, foi a escolhida para hospedar a aplicação.
+Based on these requirements, we excluded all regions without `t2.micro`. Then, we excluded the `us-east-1` (N. Virginia) region due to the immense number of outages. We excluded `ap-southeast-2` (Sydney), `ap-northeast-1` (Tokyo), and `sa-east-1` (São Paulo) due to large cost differences compared to `us-east-1` (N. Virginia). Finally, we excluded `us-west-2` (Oregon) due to its outage history, despite being the second cheapest region. This left us with a tie between `eu-west-1` (Ireland) and `ap-southeast-1` (Singapore), and since the `eu-west-1` (Ireland) region has an 11% lower cost, it was chosen to host the application.
 
-### A escolha de monitoramento
+### Monitoring Choice
 
-O projeto utiliza o CloudWatch para monitorar as instâncias EC2 e o RDS. Métricas essenciais, como Utilização de CPU e Contagem de Requisições da ALB, são monitoradas. Para a utilização de CPU, políticas de escalonamento são definidas em 70% para acionar a expansão e 20% para a redução, garantindo eficiência financeira de recursos. Da mesma forma, a métrica de Contagem de Requisições da ALB é configurada com limites 150 requisições, em um intervalo de espera de 5 minutos para evitar uma redução rápida de escala.
+The project uses CloudWatch to monitor EC2 instances and RDS. Essential metrics like CPU Utilization and ALB Request Count are monitored. For CPU utilization, scaling policies are defined at 70% to trigger expansion and 20% for reduction, ensuring resource financial efficiency. Similarly, the ALB Request Count metric is configured with limits of 150 requests, with a 5-minute wait interval to prevent rapid scale reduction.
 
-### A escolha de instâncias
+### Instance Choice
 
-O projeto utiliza a `t2.micro` para implantação de instâncias EC2. Por ser uma aplicação CRUD, essa configuração de baixo custo provisiona recursos suficientes para lidar com essas operações básicas. Isso contribui para maximizar a eficiência financeira do projeto.
+The project uses `t2.micro` for EC2 instance deployment. Being a CRUD application, this low-cost configuration provides sufficient resources to handle these basic operations. This contributes to maximizing the project's financial efficiency.
 
-### A escolha do banco de dados
+### Database Choice
 
-O projeto utiliza a `db.t2.micro` para o RDS, que é ótima para operações CRUD. Optamos pela implantação em Multi-Availability Zone para garantir alta disponibilidade, bem como tolerância a falhas. Por fim, optamos pelo General Purpose SSD (GP2) com capacidade de 20GB que dá uma ótima margem para necessidades de armazenamento do projeto, que cobre uma possível escalada de requisitos do projeto.
+The project uses `db.t2.micro` for RDS, which is great for CRUD operations. We opted for Multi-Availability Zone deployment to ensure high availability and fault tolerance. Finally, we chose General Purpose SSD (GP2) with 20GB capacity, which provides a great margin for the project's storage needs and covers possible project requirement escalation.
 
-## Estimativa de custo de manutenção mensal
+## Monthly Maintenance Cost Estimate
 
-Para realizar uma estimativa de custos, foi utilizado o [AWS Pricing Calculator](https://calculator.aws/#/). Os custos foram estimados para um período de 1 mês, e os valores foram convertidos para Reais utilizando a cotação do dólar do dia 03/12/2023, de R$4,92, de acordo com o [Banco Central do Brasil](https://www.bcb.gov.br/conversao).
+To make a cost estimate, the [AWS Pricing Calculator](https://calculator.aws/#/) was used. Costs were estimated for a 1-month period, and values were converted to Brazilian Reais using the dollar exchange rate of December 3, 2023, of R$4.92, according to the [Central Bank of Brazil](https://www.bcb.gov.br/conversao).
 
-O valor total estimado para o período de 1 mês foi de **$73.71**, ou seja, **R$362,65**. O resultado da calculadora de custo já com os valores de cada serviço configurado está disponível publicamente [neste link](https://calculator.aws/#/estimate?id=38b2eace6007c3130f5064e74299cf6d9eea6c94), ou no PDF dentro do repositório, no caminho `/docs/AWS Pricing Calculator`. Abaixo, temos um resumo da configuração utilizada para a estimativa de custos:
+The total estimated value for the 1-month period was **$73.71**, or **R$362.65**. The cost calculator result with each service's values configured is publicly available [at this link](https://calculator.aws/#/estimate?id=38b2eace6007c3130f5064e74299cf6d9eea6c94), or in the PDF within the repository at `/docs/AWS Pricing Calculator`. Below is a summary of the configuration used for cost estimation:
 
 ### Amazon Virtual Private Cloud (VPC)
 
-Parâmetros:
+Parameters:
 
-- Região: `eu-west-1` (Ireland);
-- VPC services: `Data Transfer`;
-- Number of VPN Connections: `1`;
-- Data Transfer Intra-region (GB): `1`;
-- Data Transfer All other regions (GB): `1`.
-- Data Transfer Out to Internet (GB): `1`;
+- Region: `eu-west-1` (Ireland)
+- VPC services: `Data Transfer`
+- Number of VPN Connections: `1`
+- Data Transfer Intra-region (GB): `1`
+- Data Transfer All other regions (GB): `1`
+- Data Transfer Out to Internet (GB): `1`
 
 ### Amazon RDS for MySQL
 
-Parâmetros:
+Parameters:
 
-- Região: `eu-west-1` (Ireland);
-- Quantidade de instâncias: `1`;
-- Tipo de instância: `db.t2.micro`;
-- Utilização: `On-Demand (100%)`;
-- Deployment options: `Multi-AZ`;
-- Storage: `General Purpose SSD (gp2)`;
-- Storage (GB): `20`.
+- Region: `eu-west-1` (Ireland)
+- Number of instances: `1`
+- Instance type: `db.t2.micro`
+- Utilization: `On-Demand (100%)`
+- Deployment options: `Multi-AZ`
+- Storage: `General Purpose SSD (gp2)`
+- Storage (GB): `20`
 
 ### Amazon EC2
 
-Parâmetros:
+Parameters:
 
-- Região: `eu-west-1` (Ireland);
-- Tipo de instância: `t2.micro`;
-- Tenancy: `Shared`;
-- Operating System: `Linux`;
-- Workloads: `Daily spike traffic`;
-- Workload (days): `Monday to Friday`;
-- Baseline (instances): `2`;
-- Peak (instances): `6`;
-- Duration of peak (hours): `6`;
-- Payment option: `EC2 Instance Savings Plans (1 Year, No Upfront)`.
+- Region: `eu-west-1` (Ireland)
+- Instance type: `t2.micro`
+- Tenancy: `Shared`
+- Operating System: `Linux`
+- Workloads: `Daily spike traffic`
+- Workload (days): `Monday to Friday`
+- Baseline (instances): `2`
+- Peak (instances): `6`
+- Duration of peak (hours): `6`
+- Payment option: `EC2 Instance Savings Plans (1 Year, No Upfront)`
 
 ### Elastic Load Balancing
 
-Parâmetros:
+Parameters:
 
-- Região: `eu-west-1` (Ireland);
-- Tipo de load balancer: `Application Load Balancer`;
-- Features: `Load Balancer on Outposts`;
-- Número de ALBs: `1`.
+- Region: `eu-west-1` (Ireland)
+- Load balancer type: `Application Load Balancer`
+- Features: `Load Balancer on Outposts`
+- Number of ALBs: `1`
 
 ### Amazon Simple Storage Service (S3)
 
-Parâmetros:
+Parameters:
 
-- Região: `eu-west-1` (Ireland);
-- S3 Storage Class: `Standard`;
-- Storage (GB): `0.01`;
-- Requests: `10`;
-- Data Returned by S3 Select (GB): `0.001`.
-- Data Scanned by S3 Select (GB): `0.01`.
+- Region: `eu-west-1` (Ireland)
+- S3 Storage Class: `Standard`
+- Storage (GB): `0.01`
+- Requests: `10`
+- Data Returned by S3 Select (GB): `0.001`
+- Data Scanned by S3 Select (GB): `0.01`
 
 ### Amazon DynamoDB
 
-Parâmetros:
+Parameters:
 
-- Região: `eu-west-1` (Ireland);
-- Features: `DynamoDB Data Import from Amazon S3 feature`;
-- Source file size (GB): `0.01`;
+- Region: `eu-west-1` (Ireland)
+- Features: `DynamoDB Data Import from Amazon S3 feature`
+- Source file size (GB): `0.01`
 
 ### Amazon API Gateway
 
-Parâmetros:
+Parameters:
 
-- Região: `eu-west-1` (Ireland);
-- API Type: `REST API`;
-- Request units: `millions`;
-- Requests per month: `1`;
+- Region: `eu-west-1` (Ireland)
+- API Type: `REST API`
+- Request units: `millions`
+- Requests per month: `1`
 
 ### Amazon CloudWatch
 
-Parâmetros:
+Parameters:
 
-- Região: `eu-west-1` (Ireland);
-- Number of metrics: `2`;
-- Number of Standard Resolution Alarm Metrics: `2`;
+- Region: `eu-west-1` (Ireland)
+- Number of metrics: `2`
+- Number of Standard Resolution Alarm Metrics: `2`
 
-## Custo real utilizando o Locust para testes de carga
+## Real Cost Using Locust for Load Testing
 
-Para realizar os testes de carga, foi utilizado o Locust, uma ferramenta de código aberto para testes de carga. Sua utilização foi tão somente acessar o endereço no navegador e configurar um teste de carga de 250 usuários, com 50 usuários por segundo, e um tempo de execução de 10 minutos. O resultado do teste pode ser visto nas imagens abaixo:
+For load testing, Locust, an open-source load testing tool, was used. Its use was simply to access the address in the browser and configure a load test of 250 users, with 50 users per second, and a runtime of 10 minutes. The test result can be seen in the images below:
 
 ![Locust 1](./docs/Locust_chart.png)
 
 ![Locust 2](./docs/Locust_current_ratio.png)
 
-Isso resulta na execução da Policy estabelecida para o ALB, que pode ser vista no dashboard depois de pouco tempo de execução do teste:
+This results in the execution of the established Policy for ALB, which can be seen in the dashboard after a short test execution time:
 
 ![Dashboard 1](./docs/AWS_dashboard_before.jpeg)
-
-Depois do fim do teste carga, podemos ver que foi bem sucedido o downscaling das instâncias EC2:
-
-![Dashboard 2](./docs/AWS_dashboard_after.png)
-
-Para calcular o custo real de manutenção mensal, foi utilizado o [AWS Billing and Cost Management](https://console.aws.amazon.com/billing/home?#/).
-
-Como forma de validar a estimativa da Calculadora de Custos AWS, levamos em conta o tempo em que o teste carga rodou (10 minutos), com uma taxa de swarm do Locust de aproximadamente 122 RPS. Assim, observamos o painel de custos da região `eu-west-1` (Ireland), que pode ser visto abaixo:
-
-![Billing 1](./docs/AWS_dashboard_price.png)
-
-Contudo é necessário deduzir os custos não relacionados ao swarm do Locust, neste caso os valores contornados em vermelho na imagem abaixo:
-
-![Billing 2](./docs/AWS_dashboard_deduction.png)
-
-Portanto, do total de **$3.51**, devem ser descontados:
-
-- 10 minutos representam aproximadamente 1.11% de 15 horas, portanto 11% sobre $0.54, resulta em desconto de **$0,48**;
-- 10 minutos representam aproximadamente 0.52% de 32 horas, portanto 0.52% sobre $1.54, resulta em desconto de **$1.53**;
-- 10 minutos representam aproximadamente 0.56% de 30 horas, portanto 0.56% sobre $0.39, resulta em desconto de **$0.389**.
-
-Assim, o custo real de manutenção em 10 minutos de teste de carga é de **$1.111**. Vale ressaltar que esse é um fluxo muito atípico e que representa o equivalente ao fluxo de 1 dia da aplicação no mundo real. Assim, podemos extrapolar isso para a aplicação rodando todos os dias da semana, o custo real de manutenção mensal é de **$33,33**, ou seja, **R$163,99**.
