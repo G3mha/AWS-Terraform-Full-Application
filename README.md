@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Project developed by **Enricco Gemha** for the **Cloud Computing** course in the **Computer Engineering** program at **Insper Institute of Teaching and Research**.
+Project developed by **Enricco Gemha** for the **Cloud Computing** course in the **Computer Engineering** program at **Insper**.
 
 Following the project specifications, a simple CRUD was developed in Python using FastAPI and SQLAlchemy frameworks, along with a MySQL database, available at [Python-FastAPI-CRUD](https://github.com/G3mha/Python-FastAPI-CRUD).
 
